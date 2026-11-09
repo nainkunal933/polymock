@@ -1,0 +1,11 @@
+{
+  "name": "polymock",
+  "version": "0.1.0",
+  "description": "Generate synthetic sandbox data and populate SQL Server running in Docker.",
+  "author": {
+    "name": "nainkunal933"
+  },
+  "homepage": "https://github.com/nainkunal933/polymock",
+  "repository": "https://github.com/nainkunal933/polymock",
+  "license": "MIT"
+}

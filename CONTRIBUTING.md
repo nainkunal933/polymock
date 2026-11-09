@@ -1,5 +1,24 @@
 # Contributing to Polymock
 
+## Claude Code plugin
+
+Install uv 0.12.23 or newer and make sure `uv` is on Claude Code's `PATH`.
+Run Claude Code from the project you want to seed.
+
+```sh
+claude plugin marketplace add nainkunal933/polymock
+claude plugin install polymock@polymock-marketplace
+```
+
+To check local changes, run `claude plugin validate .` and
+`claude --plugin-dir .` from the Polymock checkout. Confirm the server is
+connected with `/mcp`. From a separate project, pass the absolute path to
+the Polymock checkout to `--plugin-dir`.
+
+Bump `.claude-plugin/plugin.json`'s version when shipping plugin updates.
+For the official directory, submit the repository root as a **Plugin bundle**
+through the [Claude developer portal](https://claude.ai/directory/manage).
+
 ## Automated native builds
 
 The **Test builds** workflow checks all four native builds on PR updates. The
