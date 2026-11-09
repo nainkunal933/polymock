@@ -1,0 +1,16 @@
+{
+  "name": "polymock-marketplace",
+  "owner": {
+    "name": "nainkunal933"
+  },
+  "metadata": {
+    "description": "Install Polymock for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "polymock",
+      "source": "./",
+      "description": "Generate synthetic sandbox data and populate SQL Server running in Docker."
+    }
+  ]
+}
