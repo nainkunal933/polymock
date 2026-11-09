@@ -63,7 +63,7 @@ class ProjectRootInput(BaseModel):
     project_root: str = Field(
         description=(
             "Relative or absolute path to an existing project directory on the "
-            "machine running Sandboxer. Relative paths start from the current folder."
+            "machine running Polymock. Relative paths start from the current folder."
         )
     )
 
@@ -274,7 +274,7 @@ def request_docker_context(project_root: str) -> Elicit[DockerChoiceInput]:
     """Create the output folder and ask where the target container exists."""
     try:
         root = ProjectRootInput(project_root=project_root).project_root
-        (Path(root) / ".sandboxer" / "populate").mkdir(parents=True, exist_ok=True)
+        (Path(root) / ".polymock" / "populate").mkdir(parents=True, exist_ok=True)
         contexts = list_docker_contexts()
     except (OSError, ValueError) as error:
         raise ToolError(str(error)) from error

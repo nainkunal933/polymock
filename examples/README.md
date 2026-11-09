@@ -10,10 +10,10 @@ Includes CRUD stored procedures for each table.
 With Docker running Linux containers, execute from the repository root in PowerShell:
 
 ```powershell
-docker build --pull -t sandboxer-blog ./examples/blog
+docker build --pull -t polymock-blog ./examples/blog
 $env:MSSQL_SA_PASSWORD = 'BlogExample!2025'
-docker run --name sandboxer-blog -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD -p 127.0.0.1:1433:1433 -d sandboxer-blog
-docker logs -f sandboxer-blog
+docker run --name polymock-blog -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD -p 127.0.0.1:1433:1433 -d polymock-blog
+docker logs -f polymock-blog
 ```
 
 ## Shopping cart
@@ -26,7 +26,7 @@ Creates collections with JSON Schema validators on startup.
 With Docker running Linux containers, execute from the repository root in PowerShell:
 
 ```powershell
-docker build --pull -t sandboxer-shopping-cart ./examples/shopping_cart
-docker run --name sandboxer-shopping-cart -p 127.0.0.1:27017:27017 -d sandboxer-shopping-cart
-docker logs -f sandboxer-shopping-cart
+docker build --pull -t polymock-shopping-cart ./examples/shopping_cart
+docker run --name polymock-shopping-cart -p 127.0.0.1:27017:27017 -d polymock-shopping-cart
+docker logs -f polymock-shopping-cart
 ```

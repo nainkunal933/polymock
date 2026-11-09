@@ -1,4 +1,4 @@
-"""Shared Sandboxer business logic."""
+"""Shared Polymock business logic."""
 
 from .context import build_context, normalize_target_options
 from .generation import (

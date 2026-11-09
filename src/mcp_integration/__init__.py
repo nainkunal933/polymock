@@ -1,5 +1,5 @@
-"""MCP server integration for Sandboxer."""
+"""MCP server integration for Polymock."""
 
-from .server import SandboxerMCPServer
+from .server import PolymockMCPServer
 
-__all__ = ["SandboxerMCPServer"]
+__all__ = ["PolymockMCPServer"]

@@ -1,4 +1,4 @@
-"""Generation orchestration and prompts shared by the CLI and MCP server."""
+"""Generation orchestration and prompts for the MCP server."""
 
 import csv
 from importlib.resources import files

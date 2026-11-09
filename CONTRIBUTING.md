@@ -1,4 +1,4 @@
-# Contributing to Sandboxer
+# Contributing to Polymock
 
 ## Automated native builds
 
@@ -9,10 +9,10 @@ executable, the README, and the license:
 
 | Artifact | Target |
 | --- | --- |
-| `sandboxer-linux-x86_64` | Linux x86_64, glibc 2.35 or newer (Ubuntu 22.04 baseline) |
-| `sandboxer-windows-x86_64` | Windows x86_64 |
-| `sandboxer-macos-arm64` | macOS 15 or newer, Apple Silicon |
-| `sandboxer-macos-x86_64` | macOS 15 or newer, Intel |
+| `polymock-linux-x86_64` | Linux x86_64, glibc 2.35 or newer (Ubuntu 22.04 baseline) |
+| `polymock-windows-x86_64` | Windows x86_64 |
+| `polymock-macos-arm64` | macOS 15 or newer, Apple Silicon |
+| `polymock-macos-x86_64` | macOS 15 or newer, Intel |
 
 Download an artifact from a successful workflow run and extract both the
 GitHub artifact wrapper and the archive inside it. Windows uses ZIP; Linux

@@ -1,5 +1,5 @@
 [project]
-name = "sandboxer"
+name = "polymock"
 version = "0.1.0"
 description = "A local MCP server that generates data for your sandbox."
 readme = "README.md"

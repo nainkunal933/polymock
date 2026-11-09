@@ -1,4 +1,4 @@
-"""Tools exposed by the Sandboxer MCP server."""
+"""Tools exposed by the Polymock MCP server."""
 
 from pathlib import Path
 from typing import Annotated
@@ -35,11 +35,11 @@ def analyze(
     resolved_root: Annotated[ProjectRootInput, Resolve(resolve_project_root)],
     values: dict[str, str] | None = None,
 ) -> dict[str, object]:
-    """Choose a project root, create .sandboxer, and inventory nonignored files.
+    """Choose a project root, create .polymock, and inventory nonignored files.
 
     Return inventory_csv_path, file_count, validated context, and a prompt.
     The host agent should execute the returned prompt to inspect candidate files
-    and create .sandboxer/schema.md relative to the project root, detailing
+    and create .polymock/schema.md relative to the project root, detailing
     create/insert interfaces in Population and listing other procedures briefly
     under Procedure references. Database metadata records data models, engines,
     and source-declared database names without selecting a target database.
@@ -48,7 +48,7 @@ def analyze(
     """
     context = build_context(objective, values)
     project_root = Path(resolved_root.project_root)
-    (project_root / ".sandboxer").mkdir(exist_ok=True)
+    (project_root / ".polymock").mkdir(exist_ok=True)
     inventory_csv_path, file_count = create_file_inventory(project_root)
     return {
         "project_root": resolved_root.project_root,
@@ -77,7 +77,7 @@ def generate(
     """Select a target, stage creation procedures, and ask for a record count.
 
     Before calling, use the project_root returned by analyze. Read Database
-    metadata and Structure in .sandboxer/schema.md to prepare target_options from
+    metadata and Structure in .polymock/schema.md to prepare target_options from
     actual table or collection names, preserving qualified names and excluding
     descriptive headings. Supply the source-verified data_model enum value and
     engine from Database metadata for those targets. Both arguments are required;
@@ -96,7 +96,7 @@ def generate(
     If schema.md is missing, request analyze instead of inventing options or paths.
 
     After selection, Python copies only the selected target's mapped creation
-    files into .sandboxer/generate, preserving filenames and contents. Existing
+    files into .polymock/generate, preserving filenames and contents. Existing
     staged files are not deleted. Identical copies are reused; missing sources
     and filename/content conflicts fail without replacing existing files.
     Once copying succeeds, always ask how many records to create: 10, 50, 100,
@@ -146,7 +146,7 @@ def populate(
     Python creates the output folder, lists Docker contexts, and asks the user
     which environment contains the container. Then it lists running containers
     only in that context and asks the user to select a container name.
-    After selection, Python writes one SQL file per pair in .sandboxer/populate.
+    After selection, Python writes one SQL file per pair in .polymock/populate.
     The file includes the copied definition and a new parameterless procedure
     calling it once per CSV record. Names use the copied filename stem and actual
     CSV row count: User_Create_Populate_50.sql. A matching count replaces that
@@ -161,7 +161,7 @@ def populate(
     failures raise a tool error; generated SQL files remain available.
     """
     root = ProjectRootInput(project_root=project_root).project_root
-    populate_path = Path(root) / ".sandboxer" / "populate"
+    populate_path = Path(root) / ".polymock" / "populate"
     try:
         if not database.strip():
             raise ValueError("The target database name is required.")

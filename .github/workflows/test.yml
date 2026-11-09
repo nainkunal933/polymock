@@ -17,16 +17,16 @@ jobs:
         include:
           - os: ubuntu-22.04
             target: linux-x86_64
-            executable: sandboxer
+            executable: polymock
           - os: windows-2022
             target: windows-x86_64
-            executable: sandboxer.exe
+            executable: polymock.exe
           - os: macos-15
             target: macos-arm64
-            executable: sandboxer
+            executable: polymock
           - os: macos-15-intel
             target: macos-x86_64
-            executable: sandboxer
+            executable: polymock
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -59,11 +59,11 @@ jobs:
               for source in (Path('dist') / os.environ['EXECUTABLE'], Path('README.md'), Path('LICENSE')):
                   shutil.copy2(source, staging)
               archive_format = 'zip' if os.name == 'nt' else 'gztar'
-              shutil.make_archive('artifacts/sandboxer-' + os.environ['TARGET'], archive_format, staging)
+              shutil.make_archive('artifacts/polymock-' + os.environ['TARGET'], archive_format, staging)
       - name: Upload native archive
         uses: actions/upload-artifact@v4
         with:
-          name: sandboxer-${{ matrix.target }}
+          name: polymock-${{ matrix.target }}
           path: artifacts/*
           if-no-files-found: error
           retention-days: 30
