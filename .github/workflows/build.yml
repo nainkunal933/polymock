@@ -114,12 +114,13 @@ jobs:
           retention-days: 30
 
   release:
-    name: Publish binary release
+    name: Publish packages and binary release
     needs: [prepare, build]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     permissions:
       contents: write
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - name: Download native archives
@@ -128,6 +129,52 @@ jobs:
           pattern: polymock-*
           path: artifacts
           merge-multiple: true
+      - name: Install ORAS
+        uses: oras-project/setup-oras@v2.0.3
+        with:
+          version: '1.3.5'
+      - name: Authenticate to GitHub Container Registry
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_ACTOR: ${{ github.actor }}
+        run: printf '%s' "$GH_TOKEN" | oras login ghcr.io --username "$GH_ACTOR" --password-stdin
+      - name: Publish native archives to GitHub Packages
+        shell: bash
+        working-directory: artifacts
+        env:
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+          SOURCE_URL: ${{ github.server_url }}/${{ github.repository }}
+          SOURCE_REVISION: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          package="ghcr.io/${GH_REPO,,}"
+          targets=(linux-x86_64 windows-x86_64 macos-arm64 macos-x86_64)
+          for target in "${targets[@]}"; do
+            extension=tar.gz
+            if [[ "$target" == windows-* ]]; then
+              extension=zip
+            fi
+            archive="sandboxer-${target}.${extension}"
+            test -s "$archive"
+          done
+          for target in "${targets[@]}"; do
+            extension=tar.gz
+            media_type=application/gzip
+            if [[ "$target" == windows-* ]]; then
+              extension=zip
+              media_type=application/zip
+            fi
+            archive="sandboxer-${target}.${extension}"
+            oras push "${package}:${RELEASE_TAG}-${target}" \
+              --artifact-type application/vnd.sandboxer.native.v1 \
+              --annotation "org.opencontainers.image.source=${SOURCE_URL}" \
+              --annotation "org.opencontainers.image.revision=${SOURCE_REVISION}" \
+              --annotation "org.opencontainers.image.version=${RELEASE_TAG}" \
+              --annotation "org.opencontainers.image.description=Sandboxer native executable for ${target}" \
+              "${archive}:${media_type}"
+          done
       - name: Publish GitHub Release
         uses: actions/github-script@v7
         env:
