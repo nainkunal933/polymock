@@ -1,10 +1,10 @@
-# Agent guide for Sandboxer
+# Agent guide for Polymock
 
 This file applies to the entire repository. Keep it aligned with the code.
 
 ## Project and architecture
 
-Sandboxer is a local MCP server for preparing sandbox data.
+Polymock is a local MCP server for preparing sandbox data.
 Python 3.12 is selected by `.python-version`; `pyproject.toml` requires Python
 3.12 or newer and uv 0.12.23 or newer.
 
@@ -15,7 +15,7 @@ Python 3.12 is selected by `.python-version`; `pyproject.toml` requires Python
 - `src/mcp_integration/` owns MCP tool registration, tool wrappers, and project-root
   elicitation. Keep MCP-specific dependencies and behavior in this layer.
 - `src/models/` contains unused adapter contracts and placeholder provider
-  implementations. The MCP host manages agent conversations; Sandboxer does not
+  implementations. The MCP host manages agent conversations; Polymock does not
   provide its own agent runtime.
 - `examples/blog/` contains a SQL Server example with table definitions, stored
   procedures, and Docker setup. `entrypoint.sh` waits for SQL Server, then runs
@@ -57,7 +57,7 @@ uv pip check
 uv run --locked --group build scripts/build.py
 ```
 
-The executable is `dist/sandboxer` on Linux/macOS and `dist/sandboxer.exe` on
+The executable is `dist/polymock` on Linux/macOS and `dist/polymock.exe` on
 Windows. The executable starts the MCP server directly without arguments. The
 build script accepts `--output-dir PATH`. Keep path handling and packaging portable
 across platforms.
@@ -77,9 +77,11 @@ across platforms.
 - Preserve stable traversal order, avoidance of directory symlinks and junctions,
   and exclusion of the current inventory's output directory.
 - `analyze` validates context, resolves the project root through elicitation,
-  creates `.sandboxer/`, and returns the inventory path, count, context, and schema
-  analysis prompt for the host agent to write `.sandboxer/schema.md`. The bundled
-  `.schemaignore` excludes `.sandboxer/` artifacts from the inventory.
+  creates `.polymock/`, and returns the inventory path, count, context, and schema
+  analysis prompt for the host agent to write `.polymock/schema.md`. The bundled
+  `.schemaignore` excludes `.polymock/` artifacts from the inventory and continues
+  to exclude legacy `.sandboxer/` folders. New runs use `.polymock/`; existing
+  `.sandboxer/` artifacts are not migrated automatically.
   The document has four H2 sections: Database metadata, Structure, Population, and
   Procedure references. Database metadata contains Data model, Engine, and a
   Databases array of all source-declared names, deduplicated in discovery order
@@ -97,7 +99,7 @@ across platforms.
   to those operations. Inspect creation bodies fully and other operations only
   enough to verify their classification and references, never by filename alone.
   Before calling `generate`, the host agent reads Database metadata and Structure
-  in `.sandboxer/schema.md` to prepare actual table/collection `target_options`.
+  in `.polymock/schema.md` to prepare actual table/collection `target_options`.
   It supplies required `data_model` (a DataModel enum value) and `engine`
   (a trimmed, non-empty string) for those targets. Group targets into separate
   calls for different model/engine pairs; resolve undetermined classifications
@@ -112,7 +114,7 @@ across platforms.
   `generate` validates the root without folder elicitation, trims and deduplicates
   the non-empty options, and elicits one of them. After selection,
   Python copies only that target's mapped files unchanged into
-  `.sandboxer/generate/`, preserving filenames. Sources and destinations are
+  `.polymock/generate/`, preserving filenames. Sources and destinations are
   validated before copying; identical existing copies are reused, while missing
   sources, paths outside the root, and filename/content conflicts fail without
   overwriting existing files. Previously staged files are not deleted.
@@ -145,13 +147,13 @@ across platforms.
 - `populate` is the MCP tool that executes population SQL against the target
   Docker container. It accepts `project_root`, `csv_files`, and `copied_files`
   from the earlier tools, plus a required `database` name from verified schema
-  information or user input. It creates `.sandboxer/populate`, lists Docker
+  information or user input. It creates `.polymock/populate`, lists Docker
   contexts with `docker context ls`, and elicits a context. It then uses explicit
   `docker --context <name> ps --no-trunc` to list running containers and elicits
   a container name. Choices show names, with images in the prompt for context.
   After selection, Python pairs `copied_files` and
   `csv_files` in the order returned by `generate` (one CSV per procedure), and
-  writes `.sandboxer/populate/<procedure stem>_Populate_<CSV row count>.sql`.
+  writes `.polymock/populate/<procedure stem>_Populate_<CSV row count>.sql`.
   Each file includes the copied definition and a new parameterless population
   procedure with one `EXEC` per record. Unicode literals are escaped; SQL Server
   converts values to the source procedure's parameter types. CSV headers must
@@ -193,7 +195,7 @@ across platforms.
 - Update `README.md` only with explicit developer permission. A code change alone
   does not authorize a README update; do not update it routinely with each edit.
 - The README is the repository's quick-start guide. Keep approved edits very
-  succinct and focused on what users need to install, configure, and run Sandboxer.
+  succinct and focused on what users need to install, configure, and run Polymock.
   Leave implementation details and exhaustive feature lists out of the README.
 
 ## Validation and delivery

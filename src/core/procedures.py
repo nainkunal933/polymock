@@ -13,7 +13,7 @@ def copy_procedure_files(project_root: Path, source_paths: list[str]) -> list[Pa
     content conflicts raise an error. Return destination paths in source order.
     """
     root = project_root.resolve(strict=True)
-    output = (root / ".sandboxer" / "generate").resolve()
+    output = (root / ".polymock" / "generate").resolve()
     if not output.is_relative_to(root):
         raise ValueError("The generate directory must be inside the project root.")
     if output.exists() and not output.is_dir():

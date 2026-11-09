@@ -10,7 +10,7 @@ procedures and methods only enough to verify their qualified names, operations,
 affected targets, and source paths for reference. Eligibility and filenames alone
 do not establish a file's purpose or behavior.
 
-Write .sandboxer/schema.md relative to the project root with one project-specific
+Write .polymock/schema.md relative to the project root with one project-specific
 H1 and exactly these H2 headings, in order. Use H3 or deeper for subsections.
 
 ```markdown
@@ -25,7 +25,7 @@ H1 and exactly these H2 headings, in order. Use H3 or deeper for subsections.
 ## Procedure references
 ```
 
-If .sandboxer/schema.md exists, preserve its title and source-verified schema and
+If .polymock/schema.md exists, preserve its title and source-verified schema and
 creation information, nesting schema descriptions under Structure. Replace old
 read/update/delete details with compact entries under Procedure references;
 remove their parameter tables and detailed behavior, including shared behavior
@@ -99,5 +99,5 @@ and out of the procedure files supplied to generate for copying.
 Keep the document concise: use compact tables, state shared behavior once, and
 record per-operation differences. Do not copy source bodies or repeat schema
 tables. Report missing definitions, unsupported assumptions, and unresolved issues.
-Write only .sandboxer/schema.md. Do not execute database commands or include
+Write only .polymock/schema.md. Do not execute database commands or include
 diagrams.

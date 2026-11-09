@@ -1,95 +1,64 @@
-# Sandboxer
+# Polymock
 
-Sandboxer is a context aware CLI that generates the data needed for your sandbox.
-
-## API keys
-
-Standalone CLI mode requires an API key for the selected model provider. Set the
-standard environment variable for each provider you want to use:
-
-| Provider | Environment variable |
-| --- | --- |
-| OpenAI | `OPENAI_API_KEY` |
-| Claude (Anthropic) | `ANTHROPIC_API_KEY` |
-
-To use both providers, configure both variables. Only the selected provider's key
-is required for a given request.
-
-For PowerShell session:
-
-```powershell
-$env:OPENAI_API_KEY = "your-openai-api-key"
-$env:ANTHROPIC_API_KEY = "your-anthropic-api-key"
-```
-
-For Linux or macOS terminal session (Bash or Zsh):
-
-```sh
-export OPENAI_API_KEY="your-openai-api-key"
-export ANTHROPIC_API_KEY="your-anthropic-api-key"
-```
-
-When Sandboxer is used through MCP from Codex or Claude Code, the host manages its
-own model authentication. Sandboxer API keys are needed only if Sandboxer makes
-direct calls to a model provider.
-
-The provider adapters are currently scaffolds; API key loading and model calls
-have not yet been implemented.
+Polymock is a local MCP server that generates and populates sandbox data through
+your AI agent.
 
 ## Run from source
 
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/) 0.12.23 or newer separately
-from the project's virtual environment. Then, from the project root, run:
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) 0.12.23 or newer.
+The project requires Python 3.12 or newer. From the project root, run:
 
 ```sh
 uv sync --locked
 uv run --locked src/main.py
 ```
 
-## MCP server
+This starts the MCP server over STDIO. Configure your MCP host to launch the same
+command from the project root. The host manages model authentication; Polymock
+does not require a model-provider API key for its MCP tools.
 
-Start the local STDIO server with:
+## MCP tools
 
-```sh
-uv run --locked src/main.py mcp
-```
+- `analyze`: inventories project files and provides schema analysis instructions
+  for the host agent.
+- `generate`: creates synthetic CSV data from SQL Server creation procedures.
+- `populate`: generates and executes population SQL in a selected Docker container.
 
-The server exposes two tools, both accepting `objective` and optional `values`:
-
-- `analyze`: validates context, prompts for a project folder through MCP elicitation,
-  and recursively inventories files in a temporary CSV (`filename,eligible,path`).
-  Marks schema candidates eligible by extension; contents are not scanned. Returns
-  `inventory_csv_path` and `file_count` alongside the context.
-- `generate`: returns a data generation prompt for the host model to execute.
-
-The standalone executable supports `sandboxer mcp` with the same tools.
+Generated project files are stored in `.polymock/`. Docker must be installed and
+running Linux containers for population. See [examples](examples/README.md) for
+sample databases.
 
 ## Build a standalone executable
 
-Run the build helper with the build dependency group:
-
 ```sh
+uv sync --locked --group build
 uv run --locked --group build scripts/build.py
 ```
 
-The output is `dist/sandboxer` on Linux/macOS or `dist/sandboxer.exe`
-on Windows. Use `--output-dir PATH` to choose a different destination.
-The helper can be run from any working directory; a relative output path is
-resolved from that directory. Temporary build files are removed when it exits.
+The output is `dist/polymock` on Linux/macOS or `dist/polymock.exe` on Windows.
+Use `--output-dir PATH` to choose a different destination. Builds target the
+operating system and architecture where the build runs.
 
-## Verify and run the executable
+## Run the executable
+
+Configure your MCP host to launch the executable by its absolute path, without
+arguments. The standalone executable does not require Python or uv installed.
+
+To launch it manually on Linux/macOS:
 
 ```sh
-./dist/sandboxer --help
-./dist/sandboxer --version
-./dist/sandboxer
+./dist/polymock
 ```
 
-On Windows, use `.\dist\sandboxer.exe` instead. Version output is
-`sandboxer <version>`; running without arguments displays the welcome screen and
-waits for Enter. The standalone executable does not require Python to be
-installed. Copy it to a directory on your `PATH` to run it as `sandboxer`.
+On Windows:
+
+```powershell
+.\dist\polymock.exe
+```
+
+A startup message is written to stderr, then the server waits for MCP requests.
+Press Ctrl+C to stop a manually launched instance.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for automated native builds and the release process.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for native builds and the release process.

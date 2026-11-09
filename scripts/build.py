@@ -1,4 +1,4 @@
-"""Package sandboxer as a standalone executable for the current platform."""
+"""Package polymock as a standalone executable for the current platform."""
 
 import argparse
 from pathlib import Path
@@ -17,11 +17,11 @@ def main() -> int:
     project_root = Path(__file__).resolve().parents[1]
     entrypoint = project_root / "src" / "main.py"
     output_dir = args.output_dir.resolve()
-    with tempfile.TemporaryDirectory(prefix="sandboxer-build-") as build_dir:
+    with tempfile.TemporaryDirectory(prefix="polymock-build-") as build_dir:
         result = subprocess.run([
             sys.executable, "-m", "PyInstaller",
             "--noconfirm", "--clean", "--onefile", "--console",
-            "--name", "sandboxer",
+            "--name", "polymock",
             "--distpath", str(output_dir),
             "--workpath", str(Path(build_dir) / "work"),
             "--specpath", build_dir,

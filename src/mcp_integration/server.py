@@ -1,15 +1,15 @@
-"""Sandboxer's MCP server definition."""
+"""Polymock's MCP server definition."""
 
 from mcp.server import MCPServer
 
 from .tools import analyze, generate, populate
 
 
-class SandboxerMCPServer:
-    """Expose Sandboxer capabilities to MCP-compatible agent hosts."""
+class PolymockMCPServer:
+    """Expose Polymock capabilities to MCP-compatible agent hosts."""
 
     def __init__(self) -> None:
-        self.mcp = MCPServer("Sandboxer")
+        self.mcp = MCPServer("Polymock")
         self.mcp.tool()(analyze)
         self.mcp.tool()(generate)
         self.mcp.tool()(populate)

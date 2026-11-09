@@ -4,7 +4,9 @@
 # Source: https://github.com/github/gitignore (CC0-1.0)
 # Applied by inventory.py to paths relative to the analyzed project root.
 
-# Sandboxer analysis artifacts.
+# Polymock analysis artifacts.
+.polymock/
+# Ignore artifacts from the previous project name as well.
 .sandboxer/
 
 # ===== Node.gitignore =====

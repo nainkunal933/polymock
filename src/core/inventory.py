@@ -76,7 +76,7 @@ def create_file_inventory(project_root: Path) -> tuple[Path, int]:
     output_directory = None
     csv_path = None
     try:
-        output_directory = Path(tempfile.mkdtemp(prefix="sandboxer-inventory-")).resolve()
+        output_directory = Path(tempfile.mkdtemp(prefix="polymock-inventory-")).resolve()
         csv_path = output_directory / "file_inventory.csv"
         count = 0
         with csv_path.open("w", encoding="utf-8", newline="") as stream:

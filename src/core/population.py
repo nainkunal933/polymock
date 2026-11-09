@@ -15,9 +15,9 @@ from .generation_strategies.sqlserver_generation import (
 def _staged_input(root: Path, path: str, suffix: str) -> Path:
     """Resolve an input file returned by generate inside its staging folder."""
     source = (root / path).resolve(strict=True)
-    directory = (root / ".sandboxer" / "generate").resolve(strict=True)
+    directory = (root / ".polymock" / "generate").resolve(strict=True)
     if not directory.is_relative_to(root) or not source.is_relative_to(directory):
-        raise ValueError("Population inputs must be inside .sandboxer/generate.")
+        raise ValueError("Population inputs must be inside .polymock/generate.")
     if not source.is_file() or source.suffix.lower() != suffix:
         raise ValueError(f"Expected a {suffix} input file: {source}")
     return source
@@ -37,7 +37,7 @@ def create_population_sql(
     if not copied_files or len(copied_files) != len(csv_files):
         raise ValueError("Supply one CSV per copied procedure, in the order returned by generate.")
     root = project_root.resolve(strict=True)
-    output = (root / ".sandboxer" / "populate").resolve()
+    output = (root / ".polymock" / "populate").resolve()
     if not output.is_relative_to(root):
         raise ValueError("The populate directory must be inside the project root.")
     output.mkdir(parents=True, exist_ok=True)
@@ -150,7 +150,7 @@ def execute_population_sql(
         'export SQLCMDPASSWORD="${SQLCMDPASSWORD:-${MSSQL_SA_PASSWORD:?'
         'Set SQLCMDPASSWORD or MSSQL_SA_PASSWORD in the container.}}"; '
         'exec /opt/mssql-tools18/bin/sqlcmd -S localhost -U "$1" -d "$2" -C -b -r 1 -x',
-        "sandboxer-populate", username, database,
+        "polymock-populate", username, database,
     ]
     try:
         result = subprocess.run(

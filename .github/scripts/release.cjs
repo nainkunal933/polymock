@@ -4,10 +4,10 @@ const { join } = require('node:path');
 
 const STABLE_TAG = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const ARCHIVES = [
-  'sandboxer-linux-x86_64.tar.gz',
-  'sandboxer-windows-x86_64.zip',
-  'sandboxer-macos-arm64.tar.gz',
-  'sandboxer-macos-x86_64.tar.gz',
+  'polymock-linux-x86_64.tar.gz',
+  'polymock-windows-x86_64.zip',
+  'polymock-macos-arm64.tar.gz',
+  'polymock-macos-x86_64.tar.gz',
 ];
 
 function run(command, args) {
@@ -134,7 +134,7 @@ async function publishRelease({ github, context, tag, directory = 'artifacts', e
     execute('gh', ['release', 'edit', tag, '--draft=false', '--latest']);
   } else {
     execute('gh', ['release', 'create', tag, ...assets, '--target', context.sha,
-      '--title', `Sandboxer ${tag}`, '--generate-notes']);
+      '--title', `Polymock ${tag}`, '--generate-notes']);
   }
   return 'published';
 }
