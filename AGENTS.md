@@ -4,19 +4,19 @@ This file applies to the entire repository. Keep it aligned with the code.
 
 ## Project and architecture
 
-Sandboxer is a Python CLI and local MCP server for preparing sandbox data.
+Sandboxer is a local MCP server for preparing sandbox data.
 Python 3.12 is selected by `.python-version`; `pyproject.toml` requires Python
 3.12 or newer and uv 0.12.23 or newer.
 
-- `src/main.py` delegates to `src/cli.py`, which handles argparse, the Rich UI,
-  environment loading, provider selection, and MCP startup.
+- `src/main.py` loads the project environment and starts the MCP server directly.
+  There is no interactive CLI or subcommand parser.
 - `src/core/` owns shared context validation, domain models, file inventory, and
   generation prompts. Put reusable business logic here rather than in entry points.
 - `src/mcp_integration/` owns MCP tool registration, tool wrappers, and project-root
   elicitation. Keep MCP-specific dependencies and behavior in this layer.
-- `src/agent/` owns provider-independent conversation state and request routing.
-  `src/models/` defines adapter contracts and provider implementations. The OpenAI
-  and Anthropic adapters currently raise errors because they are placeholders.
+- `src/models/` contains unused adapter contracts and placeholder provider
+  implementations. The MCP host manages agent conversations; Sandboxer does not
+  provide its own agent runtime.
 - `examples/blog/` contains a SQL Server example with table definitions, stored
   procedures, and Docker setup. `entrypoint.sh` waits for SQL Server, then runs
   `init.sql` with sqlcmd to create the Blog database and missing
@@ -42,15 +42,12 @@ Python tooling. Dependencies and versions are defined in `pyproject.toml` and
 
 ```sh
 uv sync --locked
-uv run --locked src/main.py --help
-uv run --locked src/main.py --version
-uv run --locked src/main.py mcp
+uv run --locked src/main.py
 ```
 
-Running `src/main.py` without arguments opens an interactive welcome screen and
-waits for Enter. The `configure` command is also interactive. Prefer `--help` and
-`--version` for unattended CLI smoke checks. MCP mode is a long-running STDIO
-server; exercise it with an MCP client rather than expecting it to exit unaided.
+Running `src/main.py` starts the long-running STDIO MCP server without arguments.
+Exercise it with an MCP client rather than expecting it to exit unaided; initialize
+a session and list its tools for an unattended smoke check.
 
 To build and check the standalone executable:
 
@@ -61,8 +58,9 @@ uv run --locked --group build scripts/build.py
 ```
 
 The executable is `dist/sandboxer` on Linux/macOS and `dist/sandboxer.exe` on
-Windows. The build script accepts `--output-dir PATH` and bundles version metadata
-from `pyproject.toml`. Keep path handling and packaging portable across platforms.
+Windows. The executable starts the MCP server directly without arguments. The
+build script accepts `--output-dir PATH`. Keep path handling and packaging portable
+across platforms.
 
 ## Inventory and MCP contracts
 
@@ -210,8 +208,9 @@ from `pyproject.toml`. Keep path handling and packaging portable across platform
   The blog example has 21 SQL files: four table definitions, 16 stored procedures,
   and `init.sql`; all are eligible under the broad candidate policy.
 - Use temporary fixtures and remove verification output after checking it. For
-  entry-point or packaging changes, check `--help` and `--version` and build when
-  relevant. Documentation-only changes do not require rebuilding the executable.
+  entry-point or packaging changes, initialize an MCP session and list tools, and
+  build when relevant. Documentation-only changes do not require rebuilding the
+  executable.
 - PR CI checks dependencies and builds native executables for Linux x86_64,
   Windows x86_64, and macOS arm64/x86_64. Release automation runs on `main`; follow
   `CONTRIBUTING.md` for release labels and versioning.
