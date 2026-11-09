@@ -60,7 +60,8 @@ uv run --locked --group build scripts/build.py
 The executable is `dist/polymock` on Linux/macOS and `dist/polymock.exe` on
 Windows. The executable starts the MCP server directly without arguments. The
 build script accepts `--output-dir PATH`. Keep path handling and packaging portable
-across platforms.
+across platforms. Windows builds embed `assets/icon.ico`; `assets/icon.svg` is the
+icon source, and `assets/icon.png` is a 512px render of it.
 
 ## Inventory and MCP contracts
 
