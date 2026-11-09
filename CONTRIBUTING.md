@@ -32,3 +32,17 @@ Before merging a PR, apply a release label:
 Unlabeled PRs default to patch. When multiple unreleased PRs are included, the
 largest bump wins. After all builds succeed on `main`, CI creates the Git tag and
 release automatically. Download binaries from **GitHub Releases**.
+
+The same archives are also published to **GitHub Packages** in GHCR, before the
+GitHub Release is created. Install ORAS, then download a platform archive with:
+
+```sh
+oras pull ghcr.io/OWNER/REPOSITORY:v0.1.1-windows-x86_64
+```
+
+Replace `OWNER/REPOSITORY` with the lowercase repository path and use the desired
+release version and target from the table above. Extract the downloaded archive
+before running the executable. These are OCI artifacts, not Docker images.
+
+After the first publication, set the GHCR package visibility to **Public**
+in GitHub package settings to allow anonymous downloads.

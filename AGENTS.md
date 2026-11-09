@@ -216,3 +216,7 @@ across platforms.
 - PR CI checks dependencies and builds native executables for Linux x86_64,
   Windows x86_64, and macOS arm64/x86_64. Release automation runs on `main`; follow
   `CONTRIBUTING.md` for release labels and versioning.
+  After all builds succeed, it publishes native archives as OCI artifacts to GHCR
+  with ORAS using `<release tag>-<target>` tags, then publishes GitHub Release
+  assets. The GHCR package path is the lowercase repository path. Package owners
+  must enable public visibility for anonymous ORAS downloads.
