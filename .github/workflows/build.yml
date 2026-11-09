@@ -156,7 +156,7 @@ jobs:
             if [[ "$target" == windows-* ]]; then
               extension=zip
             fi
-            archive="sandboxer-${target}.${extension}"
+            archive="polymock-${target}.${extension}"
             test -s "$archive"
           done
           for target in "${targets[@]}"; do
@@ -166,13 +166,13 @@ jobs:
               extension=zip
               media_type=application/zip
             fi
-            archive="sandboxer-${target}.${extension}"
+            archive="polymock-${target}.${extension}"
             oras push "${package}:${RELEASE_TAG}-${target}" \
-              --artifact-type application/vnd.sandboxer.native.v1 \
+              --artifact-type application/vnd.polymock.native.v1 \
               --annotation "org.opencontainers.image.source=${SOURCE_URL}" \
               --annotation "org.opencontainers.image.revision=${SOURCE_REVISION}" \
               --annotation "org.opencontainers.image.version=${RELEASE_TAG}" \
-              --annotation "org.opencontainers.image.description=Sandboxer native executable for ${target}" \
+              --annotation "org.opencontainers.image.description=Polymock native executable for ${target}" \
               "${archive}:${media_type}"
           done
       - name: Publish GitHub Release

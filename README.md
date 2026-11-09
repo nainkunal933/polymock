@@ -1,21 +1,19 @@
-# Polymock
+<h1 align="center"><img src="assets/icon.svg" alt="" width="40" height="40" align="top"> Polymock</h1>
 
 Polymock is a local MCP server that generates and populates sandbox data through
 your AI agent.
 
-## Run from source
+## Install in Claude Code
 
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/) 0.12.23 or newer.
-The project requires Python 3.12 or newer. From the project root, run:
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) 0.12.23 or newer;
+the plugin uses it to start the MCP server. Then run this in Claude Code v2.1.275
+or later:
 
-```sh
-uv sync --locked
-uv run --locked src/main.py
+```text
+/plugin install polymock --marketplace nainkunal933/polymock
 ```
 
-This starts the MCP server over STDIO. Configure your MCP host to launch the same
-command from the project root. The host manages model authentication; Polymock
-does not require a model-provider API key for its MCP tools.
+Confirm the marketplace when prompted, then choose an install scope.
 
 ## MCP tools
 
@@ -28,36 +26,39 @@ Generated project files are stored in `.polymock/`. Docker must be installed and
 running Linux containers for population. See [examples](examples/README.md) for
 sample databases.
 
-## Build a standalone executable
+## Manual setup
+
+Use these options with other MCP hosts or for development. Polymock runs over
+STDIO and needs no model-provider API key; the host handles model authentication.
+
+### Run from source
+
+Requires [uv](https://docs.astral.sh/uv/getting-started/installation/) 0.12.23 or
+newer and Python 3.12 or newer. From the project root, run:
+
+```sh
+uv sync --locked
+uv run --locked src/main.py
+```
+
+Configure your MCP host to launch the same command from the project root.
+
+### Build an executable
 
 ```sh
 uv sync --locked --group build
 uv run --locked --group build scripts/build.py
 ```
 
-The output is `dist/polymock` on Linux/macOS or `dist/polymock.exe` on Windows.
-Use `--output-dir PATH` to choose a different destination. Builds target the
-operating system and architecture where the build runs.
+This creates `dist/polymock` (Linux/macOS) or `dist/polymock.exe` (Windows) for
+the current platform. Use `--output-dir PATH` to change the destination.
 
-## Run the executable
+### Run the executable
 
-Configure your MCP host to launch the executable by its absolute path, without
-arguments. The standalone executable does not require Python or uv installed.
-
-To launch it manually on Linux/macOS:
-
-```sh
-./dist/polymock
-```
-
-On Windows:
-
-```powershell
-.\dist\polymock.exe
-```
-
-A startup message is written to stderr, then the server waits for MCP requests.
-Press Ctrl+C to stop a manually launched instance.
+Configure your MCP host to launch the executable by its absolute path, with no
+arguments. Python and uv are not required. To start it manually, run
+`./dist/polymock` or `.\dist\polymock.exe`. It writes a startup message to stderr,
+then waits for MCP requests; press Ctrl+C to stop.
 
 ## Contributing
 
