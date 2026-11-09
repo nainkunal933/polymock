@@ -1,4 +1,7 @@
-<h1 align="center"><img src="assets/icon.svg" alt="" width="40" height="40" align="top"> Polymock</h1>
+<h1 align="center">
+  <img src="assets/icon.svg" alt="" width="128" height="128"><br>
+  Polymock
+</h1>
 
 Polymock is a local MCP server that generates and populates sandbox data through
 your AI agent.

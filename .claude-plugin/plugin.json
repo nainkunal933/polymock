@@ -8,6 +8,7 @@
   "homepage": "https://github.com/nainkunal933/polymock",
   "repository": "https://github.com/nainkunal933/polymock",
   "license": "MIT",
+  "icon": "./assets/icon.png",
   "mcpServers": {
     "polymock": {
       "type": "stdio",
@@ -16,12 +17,9 @@
         "run",
         "--locked",
         "--project",
-        "${CLAUDE_PLUGIN_ROOT}",
+        "${CLAUDE_PLUGIN_ROOT}/pyproject.toml",
         "${CLAUDE_PLUGIN_ROOT}/src/main.py"
-      ],
-      "env": {
-        "UV_PROJECT_ENVIRONMENT": "${CLAUDE_PLUGIN_DATA}/venv"
-      }
+      ]
     }
   }
 }
