@@ -11,10 +11,14 @@ With Docker running Linux containers, execute from the repository root in PowerS
 
 ```powershell
 docker build --pull -t polymock-blog ./examples/blog
-$env:MSSQL_SA_PASSWORD = 'BlogExample!2025'
+$env:MSSQL_SA_PASSWORD = '<strong-password>'
 docker run --name polymock-blog -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD -p 127.0.0.1:1433:1433 -d polymock-blog
 docker logs -f polymock-blog
 ```
+
+Replace `<strong-password>` with your own password. SQL Server requires at least
+eight characters from three of these groups: uppercase, lowercase, digits, and
+symbols.
 
 ## Shopping cart
 
