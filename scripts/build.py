@@ -17,6 +17,10 @@ def main() -> int:
     project_root = Path(__file__).resolve().parents[1]
     entrypoint = project_root / "src" / "main.py"
     output_dir = args.output_dir.resolve()
+    # PyInstaller embeds .ico files only in Windows executables.
+    icon_args = []
+    if sys.platform == "win32":
+        icon_args = ["--icon", str(project_root / "assets" / "icon.ico")]
     with tempfile.TemporaryDirectory(prefix="polymock-build-") as build_dir:
         result = subprocess.run([
             sys.executable, "-m", "PyInstaller",
@@ -27,6 +31,7 @@ def main() -> int:
             "--specpath", build_dir,
             "--add-data", f"{project_root / 'src' / 'core' / '.schemaignore'}:core",
             "--add-data", f"{project_root / 'src' / 'core' / 'prompts'}:core/prompts",
+            *icon_args,
             str(entrypoint),
         ])
     return result.returncode
