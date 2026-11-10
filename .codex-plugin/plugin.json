@@ -1,0 +1,21 @@
+{
+  "name": "polymock",
+  "version": "0.1.0",
+  "description": "Generate synthetic sandbox data and populate SQL Server running in Docker.",
+  "interface": {
+    "displayName": "Polymock",
+    "composerIcon": "./assets/icon.png"
+  },
+  "mcpServers": {
+    "polymock": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--locked",
+        "--project",
+        "${PLUGIN_ROOT}",
+        "${PLUGIN_ROOT}/src/main.py"
+      ]
+    }
+  }
+}

@@ -6,17 +6,31 @@
 Polymock is a local MCP server that generates and populates sandbox data through
 your AI agent.
 
-## Install in Claude Code
+## Install
 
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/) 0.12.23 or newer;
-the plugin uses it to start the MCP server. Then run this in Claude Code v2.1.275
-or later:
+Both plugins require [uv](https://docs.astral.sh/uv/getting-started/installation/)
+0.12.23 or newer to start the MCP server.
+
+### Claude Code
+
+Run this in Claude Code v2.1.275 or later:
 
 ```text
 /plugin install polymock --marketplace nainkunal933/polymock
 ```
 
 Confirm the marketplace when prompted, then choose an install scope.
+
+### Codex
+
+Run these commands in your terminal:
+
+```sh
+codex plugin marketplace add nainkunal933/polymock
+codex plugin add polymock@polymock-marketplace
+```
+
+Start a new local Codex session in the project you want to use with Polymock.
 
 ## MCP tools
 
