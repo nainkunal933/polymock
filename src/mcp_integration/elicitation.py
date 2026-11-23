@@ -217,10 +217,39 @@ class RecordCountInput(BaseModel):
     )
 
 
+RECORD_COUNT_VALUE_KEY = "record_count"
+
+
+def supplied_record_count(values: Mapping[str, str] | None) -> int | None:
+    """Return a context-supplied record count, or None when it was not supplied.
+
+    Keys and values are trimmed like other context values; blank values count as
+    not supplied. A supplied value must be a positive whole number.
+    """
+    raw = next(
+        (
+            value.strip()
+            for key, value in (values or {}).items()
+            if key.strip() == RECORD_COUNT_VALUE_KEY and value.strip()
+        ),
+        None,
+    )
+    if raw is None:
+        return None
+    if not (raw.isascii() and raw.isdigit()) or int(raw) < 1:
+        raise ToolError(
+            f"values[{RECORD_COUNT_VALUE_KEY!r}] must be a positive whole number; got {raw!r}."
+        )
+    return int(raw)
+
+
 def request_record_count_choice(
     prepared: Annotated[PreparedGeneration, Resolve(prepare_generation)],
-) -> Elicit[RecordCountChoice]:
-    """Offer record-count choices only after procedure staging succeeds."""
+    values: dict[str, str] | None = None,
+) -> RecordCountChoice | None | Elicit[RecordCountChoice]:
+    """Offer record-count choices after staging, unless context supplies a count."""
+    if supplied_record_count(values) is not None:
+        return None
     return Elicit(
         f"How many records would you like to create for {prepared.target}? "
         "Choose 10, 50, 100, or Custom to enter another positive whole number.",
@@ -229,10 +258,14 @@ def request_record_count_choice(
 
 
 def resolve_record_count(
-    choice: Annotated[RecordCountChoice, Resolve(request_record_count_choice)],
+    choice: Annotated[RecordCountChoice | None, Resolve(request_record_count_choice)],
+    values: dict[str, str] | None = None,
 ) -> RecordCountInput | Elicit[RecordCountInput]:
-    """Resolve a preset immediately, or ask for a custom positive integer."""
-    if choice.choice == "Custom":
+    """Honor a context-supplied count, resolve a preset, or ask for a custom count."""
+    count = supplied_record_count(values)
+    if count is not None:
+        return RecordCountInput(record_count=count)
+    if choice is None or choice.choice == "Custom":
         return Elicit(
             "How many records would you like to create? Enter a positive whole number.",
             RecordCountInput,

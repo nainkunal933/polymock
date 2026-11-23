@@ -74,7 +74,7 @@ def generate(
     count: Annotated[RecordCountInput, Resolve(resolve_record_count)],
     values: dict[str, str] | None = None,
 ) -> dict[str, object]:
-    """Select a target, stage creation procedures, and ask for a record count.
+    """Select a target, stage creation procedures, and resolve a record count.
 
     Before calling, use the project_root returned by analyze. Read Database
     metadata and Structure in .polymock/schema.md to prepare target_options from
@@ -99,10 +99,12 @@ def generate(
     files into .polymock/generate, preserving filenames and contents. Existing
     staged files are not deleted. Identical copies are reused; missing sources
     and filename/content conflicts fail without replacing existing files.
-    Once copying succeeds, always ask how many records to create: 10, 50, 100,
-    or Custom. Custom requests a positive whole number with no upper limit.
-    Context values do not bypass this question. Decline/cancel aborts completion
-    without a default count; already copied files remain.
+    If the user has already stated how many records to create, pass it as
+    values["record_count"] (a positive whole number, e.g. "10") and the count
+    question is skipped; an invalid value fails without asking. Otherwise, once
+    copying succeeds, ask how many records to create: 10, 50, 100, or Custom.
+    Custom requests a positive whole number with no upper limit. Decline/cancel
+    aborts completion without a default count; already copied files remain.
     Return project_root, target, objective, values, copied_files (destination
     paths, including reused copies), integer record_count, and csv_files.
     After count acceptance, Python uses Faker to generate that many data rows per
