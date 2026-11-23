@@ -119,11 +119,13 @@ icon source, and `assets/icon.png` is a 512px render of it.
   validated before copying; identical existing copies are reused, while missing
   sources, paths outside the root, and filename/content conflicts fail without
   overwriting existing files. Previously staged files are not deleted.
-  Duplicate source paths are copied once. Only after copying succeeds, the tool
-  asks for a record count with ordered choices 10, 50, 100, and Custom. Custom
-  asks for a positive whole number with no application-imposed upper limit.
-  Context values do not skip count elicitation. Decline/cancel aborts completion
-  without a default count; staged files remain. Preparation is a resolver
+  Duplicate source paths are copied once. A count supplied as
+  `values["record_count"]` (trimmed; a positive whole number) is honored and
+  skips count elicitation; an invalid supplied value raises a tool error without
+  asking. Otherwise, only after copying succeeds, the tool asks for a record
+  count with ordered choices 10, 50, 100, and Custom. Custom asks for a positive
+  whole number with no application-imposed upper limit. Decline/cancel aborts
+  completion without a default count; staged files remain. Preparation is a resolver
   dependency of count elicitation and reuses identical files on MCP retries.
   The tool returns `project_root`, `target`, `objective`, `values`, `copied_files`
   (destination paths, including reused copies), integer `record_count`, and
@@ -138,7 +140,8 @@ icon source, and `assets/icon.png` is a 512px render of it.
   Table relationships and application-specific hash formats are not inferred.
   Each CSV is named `<procedure stem>.csv`, with numeric suffixes on repeat runs
   to preserve existing files. Incomplete outputs are removed on failure.
-  The count is elicited, not a caller-supplied tool argument. The tool does not
+  The count comes from `values["record_count"]` or elicitation, not a separate
+  tool argument. The tool does not
   parse schema.md, scan for related files, return a prompt, or execute SQL.
   No arbitrary option-count limit is imposed.
   Changes to tool arguments, return fields, CSV format, or content-scanning
