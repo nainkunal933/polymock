@@ -1,4 +1,4 @@
-"""Models, types, and helpers for MCP elicitation."""
+"""Generation target, staging, and record count elicitation models and resolvers."""
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,65 +13,10 @@ from core import (
     build_context,
     copy_procedure_files,
     normalize_target_options,
-    validate_project_root,
 )
-from core.docker import list_docker_contexts, list_running_containers
 
-
-def _remove_elicitation_metadata(schema: dict[str, object]) -> None:
-    """Remove model metadata that Codex rejects at the form schema's root."""
-    schema.pop("title", None)
-    schema.pop("description", None)
-
-
-class ProjectRootChoice(BaseModel):
-    """Whether to use the current folder or choose another directory."""
-
-    model_config = ConfigDict(json_schema_extra=_remove_elicitation_metadata)
-
-    choice: Literal["Use current folder", "Use another folder"] = Field(
-        description="Choose the project folder to use."
-    )
-
-
-class ProjectRootInput(BaseModel):
-    """Validated project root chosen by the user through elicitation."""
-
-    model_config = ConfigDict(json_schema_extra=_remove_elicitation_metadata)
-
-    project_root: str = Field(
-        description=(
-            "Relative or absolute path to an existing project directory on the "
-            "machine running Polymock. Relative paths start from the current folder."
-        )
-    )
-
-    @field_validator("project_root")
-    @classmethod
-    def validate_project_root(cls, value: str) -> str:
-        return validate_project_root(value)
-
-
-def _choose_project_root() -> Elicit[ProjectRootChoice]:
-    """Offer the current folder first, with an option to override it."""
-    return Elicit(
-        f"Use the project in the current folder: {Path.cwd()}\n"
-        "Use this folder or choose another folder with a relative or absolute path.",
-        ProjectRootChoice,
-    )
-
-
-def resolve_project_root(
-    selection: Annotated[ProjectRootChoice, Resolve(_choose_project_root)],
-) -> ProjectRootInput | Elicit[ProjectRootInput]:
-    """Resolve the selected folder, requesting an override only when needed."""
-    if selection.choice == "Use current folder":
-        return ProjectRootInput(project_root=str(Path.cwd()))
-    return Elicit(
-        "Enter the project's relative or absolute directory path. "
-        f"Relative paths start from: {Path.cwd()}",
-        ProjectRootInput,
-    )
+from ._common import _remove_elicitation_metadata
+from .project_root import ProjectRootInput
 
 
 class GenerationTargetInput(BaseModel):
@@ -241,68 +186,3 @@ def resolve_record_count(
             RecordCountInput,
         )
     return RecordCountInput(record_count=int(choice.choice))
-
-
-class DockerChoiceInput(BaseModel):
-    """A Docker context or container selected from discovered options."""
-
-    model_config = ConfigDict(json_schema_extra=_remove_elicitation_metadata)
-
-    choice: str = Field(min_length=1, description="Select a Docker target.")
-
-
-def _docker_choice(message: str, options: list[str]) -> Elicit[DockerChoiceInput]:
-    """Limit an elicitation response to the discovered Docker options."""
-    def validate_choice(value: str) -> str:
-        if value not in options:
-            raise ValueError("Choose one of the discovered Docker options.")
-        return value
-
-    choice_model = create_model(
-        "DockerTargetChoice",
-        __base__=DockerChoiceInput,
-        __validators__={"validate_choice": field_validator("choice")(validate_choice)},
-        choice=(
-            str,
-            Field(
-                description="Select a Docker target.",
-                json_schema_extra={"enum": options},
-            ),
-        ),
-    )
-    return Elicit(message, choice_model)
-
-
-def request_docker_context(project_root: str) -> Elicit[DockerChoiceInput]:
-    """Create the output folder and ask where the target container exists."""
-    try:
-        root = ProjectRootInput(project_root=project_root).project_root
-        (Path(root) / ".polymock" / "populate").mkdir(parents=True, exist_ok=True)
-        contexts = list_docker_contexts()
-    except (OSError, ValueError) as error:
-        raise ToolError(str(error)) from error
-    if not contexts:
-        raise ToolError("No Docker contexts are configured on this machine.")
-    return _docker_choice(
-        "Which Docker environment (context) contains the target container?", contexts,
-    )
-
-
-def request_docker_container(
-    docker_context: Annotated[DockerChoiceInput, Resolve(request_docker_context)],
-) -> Elicit[DockerChoiceInput]:
-    """List running containers only in the environment selected by the user."""
-    try:
-        containers = list_running_containers(docker_context.choice)
-    except (OSError, ValueError) as error:
-        raise ToolError(str(error)) from error
-    if not containers:
-        raise ToolError(f"No running containers found in Docker context {docker_context.choice!r}.")
-    details = "\n".join(
-        f"{item['Names']} ({item['Image']})" for item in containers
-    )
-    return _docker_choice(
-        f"Choose the target container in Docker context {docker_context.choice!r}.\n"
-        f"Running containers (name, image):\n{details}",
-        [item["Names"] for item in containers],
-    )
