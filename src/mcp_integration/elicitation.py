@@ -1,8 +1,8 @@
 """Models, types, and helpers for MCP elicitation."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated, Awaitable, Callable, Literal, Mapping
+from typing import Annotated, Literal, Mapping
 
 from mcp.server.mcpserver import Elicit, Resolve
 from mcp.server.mcpserver.exceptions import ToolError
@@ -13,30 +13,9 @@ from core import (
     build_context,
     copy_procedure_files,
     normalize_target_options,
+    validate_project_root,
 )
 from core.docker import list_docker_contexts, list_running_containers
-
-
-@dataclass(frozen=True, slots=True)
-class ElicitationRequest:
-    """A structured request for additional user input."""
-
-    message: str
-    schema: Mapping[str, object] = field(default_factory=dict)
-
-
-@dataclass(frozen=True, slots=True)
-class ElicitationResponse:
-    """The user's response to an elicitation request."""
-
-    accepted: bool
-    content: Mapping[str, object] | None = None
-
-
-ElicitationHandler = Callable[
-    [ElicitationRequest],
-    Awaitable[ElicitationResponse],
-]
 
 
 def _remove_elicitation_metadata(schema: dict[str, object]) -> None:
@@ -70,16 +49,7 @@ class ProjectRootInput(BaseModel):
     @field_validator("project_root")
     @classmethod
     def validate_project_root(cls, value: str) -> str:
-        if not value.strip():
-            raise ValueError("Project root must be a non-empty directory path.")
-        path = Path(value.strip()).expanduser()
-        try:
-            path = path.resolve(strict=True)
-        except (OSError, RuntimeError) as error:
-            raise ValueError("Project root does not exist or cannot be accessed.") from error
-        if not path.is_dir():
-            raise ValueError("Project root must be a directory.")
-        return str(path)
+        return validate_project_root(value)
 
 
 def _choose_project_root() -> Elicit[ProjectRootChoice]:
